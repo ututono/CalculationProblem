@@ -1,49 +1,168 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
+
+
 
 typedef struct{             //分数结构体，分母默认为1，即整数        
 	int numerator = 0;      //分子
 	int denominator = 1;    //分母			
 }Element;                   //计算项结构体
 
-FILE *questions = NULL;
-questions = fopen( "Exercises.txt", "r" );
+typedef struct{
+	char question[30];
+	Element answer;
+}Equation;
 
-char questions_list[ ][30]
-for(int i = 0;i < 188 ; i++){  //xiu
-	char buff[30]; 
-	fgets(buff, 40, (FILE*)questions);
-	questions_list[i] = buff;      //可能会释放 
+typedef struct stack1{      // 项栈
+	Element e[100];
+	int top;
+}NumberStack;
+
+typedef struct stack2{       //符号栈
+	char op[100];
+	int top;
+}OpStack;
+
+
+//两个栈的初始化操作
+void InitNumberStack(NumberStack *numberstack){
+	numberstack->top = -1;
 }
 
-	
-	
+void InitOpStack(OpStack *opstack){
+	opstack->top = -1;
+}
 
-Element GetNumberFromStr (char a[5]){  //从含单个数的字符数组中得出相应的值 
+
+//两个栈的PUSH操作
+int PushNumberStack(NumberStack *numberstack, Element e){
+	if(numberstack->top == 99 ){
+		printf("数字超出\n");
+		return -1;
+	}
+	numberstack->top++;
+	numberstack->e[numberstack->top] = e;
+	return 0;
+}
+
+int PushOpStack(OpStack *opstack, char c){
+	if(opstack->top == 99){
+		printf("符号超出\n");
+		return -1;
+	}
+	opstack->top++;
+	opstack->op[opstack->top] = c;
+	return 0;
+}
+
+
+//两个栈的POP操作
+Element PopNumberStack(NumberStack *numberstack){
+	Element e;
+	e =  numberstack->e[numberstack->top];
+	numberstack->top--;
+	return e;
+}
+
+char PopOpstack(OpStack *opstack){
+	char c;
+	c = opstack->op[opstack->top];
+	opstack->top--;
+	return c;
+}
+
+
+int JudgeOp(char c){                //判断是否为运算符
+	if (c == '+'||c == '-'||c == -62||c == '*'|| c == '('||c == ')'||c == '='||c == '\n'){    //-62
+		return 1;
+	} 
+	else return 0;
+}
+
+char CompareOp(char op1,char op2){    //优先级判断
+	char c;
+	switch(op2){
+		case '+':
+		case '-':{
+			if(op1 == '('||op1 == '=') c = '<';
+			else c = '>';
+			break;
+		}
+		case '*':
+		case -62:{
+			if(op1 == '*'||op1 == -62||op1 == ')') c = '>';
+			else c = '<';
+            break;			
+		}
+		case '(':{
+			if(op1 == ')'){
+				printf("错误输入\n");
+				return -1;
+			}
+			else c = '<';
+            break;			
+		}
+		case ')':{
+			switch(op1){
+				case '(':{
+					c = '=';
+					break;
+				}
+				case '=':{
+					printf("错误输入\n");
+					return -1; 
+				}
+                default:c = '>';				
+			}
+			break;
+		}
+		case '=':{
+			switch(op1){
+				case '=':{
+					c = '=';
+					break;
+				}
+		    	case '(':{
+				printf("错误输入\n");
+				return -1;
+			    }
+			default: c = '>';
+	    	}
+	    }
+    }
+	return c;
+}
+
+
+
+
+Element GetNumberFromStr (char s[]){  //从含单个数的字符数组中得出相应的值 
 	int flag = 0;
 	int j = 0;
 	int k = 0;
 	char buff1[5];    //盛放分子的字符串
 	char buff2[5];    //盛放分母的字符串
 	Element TheNumber; 
-	for(int i = 0;i < 5;i++){
-		buff1[j] = a[i];
+	for(int i = 0;s[i] != '\0';i++){
+		buff1[j] = s[i];
 		j++;
-		if (a[i] == '/') {
+		if (s[i] == '/') {
+			buff1[j] = '\0';
 			flag = 1;continue;
 		}
 		if(flag == 1){
-			buff2[k] = a[i];
+			buff2[k] = s[i];
 			k++;
-		}
+		}	
 	}
+	buff2[k] = '\0';
 	switch(flag){
-		case 0:TheNumber.numerator = atoi(a);break;
+		case 0:TheNumber.numerator = atoi(s);break;
 		case 1:{
 		TheNumber.numerator = atoi(buff1);
-        TheNumber.denominator = atoi(buff2);break;		
+        TheNumber.denominator = atoi(buff2);		
 		}
-		default: return ERROR;
 	}
 	return TheNumber;
 }
@@ -59,7 +178,7 @@ int GetGreatestCommonFactor(int a, int b){  //返回最大公因数
 	return b;
 }
 
-
+//计算部分
 Element Add(Element e1,Element e2){   //加法
 	Element e3;
 	int n = 0;
@@ -109,61 +228,177 @@ Element Divide(Element e1,Element e2){ //除法，前一个是被除数，后一个是除数
 }
 
 
-Element AnAnswer(char s[30]){   //得出一道题目的答案
-	Element e[4];   //结构体数组可能无法生成
-	char buff[5];
-	int OperatorCharacters[7];
-	int flag = 0;
-	int j = 0;
-	int k = 0; 
-	int l = 0;
-	for(int i = 2; s[i] != '=';i++){
-		if (s[i] == '('){
-			OperatorCharacters[l] = 0;
-			l++;
+Element CaculateOneOp(Element e1, char op, Element e2){
+	Element result;
+	switch(op){
+		case '+':{
+			result = Add(e1, e2);
+			break;
 		}
-		else if (s[i] == ')'){
-			OperatorCharacters[l] = 1;
-			l++;
-		}    
-		else if (s[i] >= 49 and s[i] <= 57 or s[i] == '/'){ //一个多位数（字符数组）开始 逐个放入buff 
-			 flag = 1;
-			 buff[j] = s[i];
-			 j++;  
+		case '-':{
+			result = minus(e1, e2);
+			break;
 		}
-		else if(flag == 1 and (s[i] < 49 or s[i] > 57)){ //一个 多位数（字符数组）结束 buff字符串通过GetNumberFromStr()得出项,存入e[]中，将buff清空 
-			flag = 0;
-			j = 0;
-			e[k] = GetNumberFromStr(buff);
-			k++; 
+        case '*':{
+			result = Multiply(e1, e2);
+			break;
+		}		
+		case -62:{
+			if(e2.numerator == 0) printf("不能除以0\n");
+			else result = Divide(e1, e2);
 		}
-		else if(s[i] == '+'){
-			OperatorCharacters[l] = 2;
-			l++;
-		}
-		else if(s[i] == '-'){
-			OperatorCharacters[l] = 3;
-			l++;
-	    }
-	    else if(s[i] == '×'){
-			OperatorCharacters[l] = 4;
-			l++;
-	   }
-	    else if(s[i] == '÷'){
-			OperatorCharacters[l] = 5;
-			l++;
-	   }
-	}  //得出项e[0]、e[1]、e[2]、e[3] 以及运算编号OperatorCharacters[] 接下来是算法
+	}
+	return result;
+}
+
+
+Element AnAnswer(char s[]){
+	NumberStack numberstack;
+	OpStack opstack;
+	Element num1,num2,result,num;
+	char c,sign;
+	char *str = NULL;
+	int count = 0;
 	
+	InitNumberStack(&numberstack);
+	InitOpStack(&opstack);
+	
+	PushOpStack(&opstack, '=');
+	int j = 0;
+	while(s[j] != '\t') j++;
+	int i = j; 
+	j = 0; 
+	c = s[i];
+	while((c != '=')||opstack.op[opstack.top] != '='){
+		if(JudgeOp(c) == 0){
+			str = (char*)malloc(sizeof(char)*11);
+			do{
+				*str = c;
+				str++;
+				count++;
+				i++;
+				c = s[i];
+			}while(JudgeOp(c) == 0); 
+			*str = '\0';
+			str = str - count;
+			num = GetNumberFromStr(str);
+			PushNumberStack(&numberstack, num);
+			str = NULL;
+			count = 0;
+		}
+		else{    //wei 
+			switch(CompareOp(opstack.op[opstack.top], c)){
+				case '<':{
+					PushOpStack(&opstack, c);
+					i++;
+					c = s[i];
+					break;
+				}
+				case '=':{
+					sign = PopOpstack(&opstack);
+					i++;
+					c = s[i];
+					break;
+				}
+                case '>':{
+					sign = PopOpstack(&opstack);
+					num2 = PopNumberStack(&numberstack);
+					num1 = PopNumberStack(&numberstack);
+					result = CaculateOneOp(num1, sign, num2);
+					PushNumberStack(&numberstack, result);
+					break;
+				}					
+				
+			}
+		}
+	}
+	result = numberstack.e[numberstack.top];
+	return result;
 }
 
 
 
 
-int *TheAnswers(char a[][30], int n) {   //通过字符串和题数得出答案数组 
-	int i = 0;
-	for(i; i <n; i++){
-		
+Equation *OpenAndSave(char c[], int n){    //打开文件并将题目存入问题结构体数组,n为题数
+	FILE *fp;
+	Equation *qu;
+	char buff[30];
+	int len;
+	int count;
+	qu = (Equation*)malloc(sizeof(Equation) * n);
+	if ((fp = fopen(c,"r")) == NULL){
+		printf("The file doesn't exist!\n");
+		exit(0);
+	}
+	while(fgets(buff,31,fp) != NULL){
+	    len = strlen(buff); 
+		buff[len-1] = '\0';            //去掉换行符
+		strcpy(qu->question , buff);     
+        qu++;
+        count++;		
+	}
+	fclose(fp);
+	qu = qu - count;
+	return qu;
+}              
+
+char *OutputElement(Element e){         //将项转为字符串
+	char *str;
+	char buff1[5];
+	char buff2[5];
+	char c[2] = {'/', ' '};
+	itoa(e.numerator , buff1 , 10);
+	itoa(e.denominator , buff2 , 10);
+	str = (char*)malloc(sizeof(char)*11);
+	strcpy(str , buff1);
+	if(e.denominator != 1){
+		strcat(str , c);
+		strcat(str , buff2);
+	}
+	return str;
+}
+
+void OutputAnswers(Equation *ep, int n) {    //计算出答案并输出,n为题数
+	int count;
+	int i = 0; 
+	for(i ; i < n; i++){
+		ep->answer = AnAnswer(ep->question);
+		ep++;
+		count++;
+	}
+	ep = ep - count;
+	int j = 0;
+	for(j ;j < n;j++){
+		char *str;
+		str = (char*)malloc(sizeof(char) * 11);
+		str = OutputElement(ep->answer);
+		printf("%s\n",str);
+		ep++;
 	}
 }
-//fclose(questions);
+
+
+
+
+
+
+
+int main(){
+	char a[5] = {'1','2','3','4','5'};
+	char b = -62;
+	
+	char s[30] = {'2','	','2','2','*','1','9','+','2','7','/','4','8','='};
+	Element e1,e2;
+	Equation *equationpoint;
+	equationpoint = (Equation*)malloc(sizeof(Equation)*5); 
+	equationpoint = OpenAndSave("e:\Question.txt",5);
+	e1 = AnAnswer(s);
+	//printf("%d/%d",e1.numerator,e1.denominator);
+	OutputAnswers(equationpoint,4);
+	//printf("%s",OutputElement(e1));
+	/*for(int i = 0;i < 5;i++){
+		printf("%s\n",equationpoint->question);
+		equationpoint++;
+	}*/
+	
+}
