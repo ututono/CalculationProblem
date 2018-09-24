@@ -10,17 +10,17 @@ typedef struct{             //分数结构体，分母默认为1，即整数
 }Element;                   //计算项结构体
 
 typedef struct{
-	char question[30];
+	char question[40];
 	Element answer;
 }Equation;
 
 typedef struct stack1{      // 项栈
-	Element e[100];
+	Element e[10];
 	int top;
 }NumberStack;
 
 typedef struct stack2{       //符号栈
-	char op[100];
+	char op[10];
 	int top;
 }OpStack;
 
@@ -252,7 +252,7 @@ Element CaculateOneOp(Element e1, char op, Element e2){
 }
 
 
-Element AnAnswer(char s[]){
+Element AnAnswer(char s[40]){     //计算得出答案项
 	NumberStack numberstack;
 	OpStack opstack;
 	Element num1,num2,result,num;
@@ -271,7 +271,7 @@ Element AnAnswer(char s[]){
 	c = s[i];
 	while((c != '=')||opstack.op[opstack.top] != '='){
 		if(JudgeOp(c) == 0){
-			str = (char*)malloc(sizeof(char)*11);
+			str = (char*)malloc(sizeof(char)*12);
 			do{
 				*str = c;
 				str++;
@@ -319,18 +319,19 @@ Element AnAnswer(char s[]){
 
 
 
-Equation *OpenAndSave(char c[], int n){    //打开文件并将题目存入问题结构体数组,n为题数
+Equation *OpenAndSave(char c[800], int n){    //打开文件并将题目存入问题结构体数组,n为题数
 	FILE *fp;
 	Equation *qu;
-	char buff[30];
+	char buff[40];                           
 	int len;
-	int count;
+	int count = 0;
 	qu = (Equation*)malloc(sizeof(Equation) * n);
 	if ((fp = fopen(c,"r")) == NULL){
 		printf("The file doesn't exist!\n");
 		exit(0);
 	}
-	while(fgets(buff,31,fp) != NULL){
+	int j = 0;
+	while(fgets(buff,50,fp) != NULL){
 	    len = strlen(buff); 
 		buff[len-1] = '\0';            //去掉换行符
 		strcpy(qu->question , buff);     
@@ -342,14 +343,14 @@ Equation *OpenAndSave(char c[], int n){    //打开文件并将题目存入问题结构体数组,
 	return qu;
 }              
 
-char *OutputElement(Element e){         //将项转为字符串
+char *OutputElement(Element e){               //将项转为字符串
 	char *str;
 	char buff1[5];
 	char buff2[5];
 	char c[2] = {'/', ' '};
 	itoa(e.numerator , buff1 , 10);
 	itoa(e.denominator , buff2 , 10);
-	str = (char*)malloc(sizeof(char)*11);
+	str = (char*)malloc(sizeof(char)*12);
 	strcpy(str , buff1);
 	if(e.denominator != 1){
 		strcat(str , c);
@@ -358,8 +359,8 @@ char *OutputElement(Element e){         //将项转为字符串
 	return str;
 }
 
-void OutputAnswers(Equation *ep, int n) {    //计算出答案并输出,n为题数
-	int count;
+void SaveAnswers(Equation *ep, int n) {    //计算出答案并保存到Equation结构的answer中,n为题数
+	int count = 0;
 	int i = 0; 
 	for(i ; i < n; i++){
 		ep->answer = AnAnswer(ep->question);
@@ -367,38 +368,54 @@ void OutputAnswers(Equation *ep, int n) {    //计算出答案并输出,n为题数
 		count++;
 	}
 	ep = ep - count;
-	int j = 0;
-	for(j ;j < n;j++){
-		char *str;
-		str = (char*)malloc(sizeof(char) * 11);
-		str = OutputElement(ep->answer);
-		printf("%s\n",str);
-		ep++;
+}
+
+void OutputFile(Equation *ep, char c[800], int n){   //将Equation结构中的answer输出到文件
+	FILE * fp;
+	int i = 0;
+	int count = 0;
+	if ((fp = fopen(c,"w")) == NULL){
+		printf("Can not open this file!\n");
+		exit(0);
 	}
+	for(i; i < n; i++){
+		char buff[6];
+		char buff1[2] = {'.','	'};
+		itoa(i, buff, 10);
+		strcat(buff, buff1);
+	    fputs(buff, fp);
+		fputs( OutputElement ( ep->answer ), fp);
+		fputs("\n",fp);
+		ep++;
+		count++;
+	}
+	ep = ep - count;
+	fclose(fp);
+	
+}
+
+void OpenFileAndGiveTheAnswer(char filename[800], int n){  //传入文件名和题目数
+	Equation* ep;
+	ep = (Equation*)malloc(sizeof(Equation) * n);
+	ep = OpenAndSave(filename, n);
+	SaveAnswers(ep, n);
+	OutputFile(ep, "E:\Answers.txt", n);
+	ep = NULL;
 }
 
 
 
 
-
-
-
 int main(){
-	char a[5] = {'1','2','3','4','5'};
-	char b = -62;
-	
-	char s[30] = {'2','	','2','2','*','1','9','+','2','7','/','4','8','='};
-	Element e1,e2;
-	Equation *equationpoint;
-	equationpoint = (Equation*)malloc(sizeof(Equation)*5); 
-	equationpoint = OpenAndSave("e:\Question.txt",5);
-	e1 = AnAnswer(s);
-	//printf("%d/%d",e1.numerator,e1.denominator);
-	OutputAnswers(equationpoint,4);
-	//printf("%s",OutputElement(e1));
-	/*for(int i = 0;i < 5;i++){
-		printf("%s\n",equationpoint->question);
-		equationpoint++;
-	}*/
+	//Equation* ep;
+	//ep = (Equation*)malloc(sizeof(Equation) * 100);
+	//ep = OpenAndSave("e:\\Question.txt", 100);
+	//int count = 0;
+//	SaveAnswers(ep, 100);
+	//OutputFile(ep, "E:\Answers.txt", 100);
+	//ep = ep - count;
+	//ep = NULL;
+	OpenFileAndGiveTheAnswer("e:\\Question1.txt", 10000);
+    return 0;
 	
 }
