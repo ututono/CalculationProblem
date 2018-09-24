@@ -399,7 +399,7 @@ void OpenFileAndGiveTheAnswer(char filename[800], int n){  //传入文件名和题目数
 	ep = (Equation*)malloc(sizeof(Equation) * n);
 	ep = OpenAndSave(filename, n);
 	SaveAnswers(ep, n);
-	OutputFile(ep, "E:\Answers.txt", n);
+	OutputFile(ep, "Answers.txt", n);
 	ep = NULL;
 }
 
@@ -407,15 +407,6 @@ void OpenFileAndGiveTheAnswer(char filename[800], int n){  //传入文件名和题目数
 
 
 int main(){
-	//Equation* ep;
-	//ep = (Equation*)malloc(sizeof(Equation) * 100);
-	//ep = OpenAndSave("e:\\Question.txt", 100);
-	//int count = 0;
-//	SaveAnswers(ep, 100);
-	//OutputFile(ep, "E:\Answers.txt", 100);
-	//ep = ep - count;
-	//ep = NULL;
 	OpenFileAndGiveTheAnswer("e:\\Question1.txt", 10000);
-    return 0;
-	
+    return 0;	
 }
