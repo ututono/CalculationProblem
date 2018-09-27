@@ -286,7 +286,7 @@ Element AnAnswer(char s[40]){     //计算得出答案项
 			str = NULL;
 			count = 0;
 		}
-		else{    //wei 
+		else{    x
 			switch(CompareOp(opstack.op[opstack.top], c)){
 				case '<':{
 					PushOpStack(&opstack, c);
