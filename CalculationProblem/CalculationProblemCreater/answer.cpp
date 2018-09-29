@@ -450,10 +450,26 @@ Element *ReadTheAnswer(char AnsFile[800], int n) { //´ò¿ªÎÄ¼þ²¢½«´ð°¸´æÈë·ÖÊý½á¹
 
 char *OutputElement(Element e) {               //½«Ïî×ªÎª×Ö·û´®
 	char *str;
-	char buff1[10];
-	char buff2[10];
+	char buff1[30];
+	char buff2[30];
+	char temp[30];
+	int daifenshu = 0;
 	char c[3] = { '/', ' ' };
-	_itoa(e.numerator, buff1, 10);
+	if (e.numerator > e.denominator&&e.denominator!=1)
+	{
+		daifenshu = e.numerator / e.denominator;
+		e.numerator = e.numerator-daifenshu * e.denominator ;
+		if (e.numerator == 0)
+		{
+			e.numerator = daifenshu;
+			e.denominator = 1;
+		}
+		_itoa(daifenshu,buff1, 10);
+		strcat_s(buff1, strlen(buff1) + 2, "^");
+		_itoa(e.numerator, temp, 10);
+		strcat_s(buff1, strlen(buff1) + 1 + strlen(temp), temp);
+	}
+	else _itoa(e.numerator, buff1, 10);
 	_itoa(e.denominator, buff2, 10);
 	str = (char*)malloc(sizeof(char) * 14);
 	strcpy(str, buff1);
