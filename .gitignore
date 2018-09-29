@@ -1,5 +1,6 @@
 #Folder
 Debug/*
+TestAnswer/*
 # Prerequisites
 *.d
 *.vspx

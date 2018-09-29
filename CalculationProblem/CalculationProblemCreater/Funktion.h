@@ -13,4 +13,5 @@ char OperationalCreater();				//	运算符生成函数
 void NumCreater(int r, struct Variable m_VarStruct[], int x);	// 变量生成函数，r为范围参数，x为结构体数组编号
 int Creater(int r);
 BOOL BracketCreater(char *,int,int);		//生成括号,返回值0无法生成括号
-char *CalProblem(int num);
+char *CalProblem(int num,int rlen);
+void DelBracket(char *calproblem);		//	去括号函数

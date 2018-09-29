@@ -1,34 +1,8 @@
-// TestAnswer.cpp : æ­¤æ–‡ä»¶åŒ…å« "main" å‡½æ•°ã€‚ç¨‹åºæ‰§è¡Œå°†åœ¨æ­¤å¤„å¼€å§‹å¹¶ç»“æŸã€‚
-//
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <windows.h>
-
-typedef struct {             //åˆ†æ•°ç»“æ„ä½“ï¼Œåˆ†æ¯é»˜è®¤ä¸º1ï¼Œå³æ•´æ•°        
-	int numerator = 0;      //åˆ†å­
-	int denominator = 1;    //åˆ†æ¯			
-}Element;                   //è®¡ç®—é¡¹ç»“æ„ä½“
-
-typedef struct {
-	char question[40] = {0};
-	Element answer;
-}Equation;
-
-typedef struct stack1 {      // é¡¹æ ˆ
-	Element e[10];
-	int top;
-}NumberStack;
-
-typedef struct stack2 {       //ç¬¦å·æ ˆ
-	char op[10];
-	int top;
-}OpStack;
+#include "pch.h"
+#include "answer.h"
 
 
-//ä¸¤ä¸ªæ ˆçš„åˆå§‹åŒ–æ“ä½œ
+//Á½¸öÕ»µÄ³õÊ¼»¯²Ù×÷
 void InitNumberStack(NumberStack *numberstack) {
 	numberstack->top = -1;
 }
@@ -38,10 +12,10 @@ void InitOpStack(OpStack *opstack) {
 }
 
 
-//ä¸¤ä¸ªæ ˆçš„PUSHæ“ä½œ
+//Á½¸öÕ»µÄPUSH²Ù×÷
 int PushNumberStack(NumberStack *numberstack, Element e) {
 	if (numberstack->top == 99) {
-		printf("æ•°å­—è¶…å‡º\n");
+		printf("Êı×Ö³¬³ö\n");
 		return -1;
 	}
 	numberstack->top++;
@@ -51,7 +25,7 @@ int PushNumberStack(NumberStack *numberstack, Element e) {
 
 int PushOpStack(OpStack *opstack, char c) {
 	if (opstack->top == 99) {
-		printf("ç¬¦å·è¶…å‡º\n");
+		printf("·ûºÅ³¬³ö\n");
 		return -1;
 	}
 	opstack->top++;
@@ -60,7 +34,7 @@ int PushOpStack(OpStack *opstack, char c) {
 }
 
 
-//ä¸¤ä¸ªæ ˆçš„POPæ“ä½œ
+//Á½¸öÕ»µÄPOP²Ù×÷
 Element PopNumberStack(NumberStack *numberstack) {
 	Element e;
 	e = numberstack->e[numberstack->top];
@@ -76,14 +50,14 @@ char PopOpstack(OpStack *opstack) {
 }
 
 
-int JudgeOp(char c) {                //åˆ¤æ–­æ˜¯å¦ä¸ºè¿ç®—ç¬¦
+int JudgeOp(char c) {                //ÅĞ¶ÏÊÇ·ñÎªÔËËã·û
 	if (c == '+' || c == '-' || c == -62 || c == '*' || c == '(' || c == ')' || c == '=' || c == '\n') {    //-62
 		return 1;
 	}
 	else return 0;
 }
 
-char CompareOp(char op1, char op2) {    //ä¼˜å…ˆçº§åˆ¤æ–­
+char CompareOp(char op1, char op2) {    //ÓÅÏÈ¼¶ÅĞ¶Ï
 	char c;
 	switch (op2) {
 	case '+':
@@ -100,7 +74,7 @@ char CompareOp(char op1, char op2) {    //ä¼˜å…ˆçº§åˆ¤æ–­
 	}
 	case '(': {
 		if (op1 == ')') {
-			printf("é”™è¯¯è¾“å…¥\n");
+			printf("´íÎóÊäÈë\n");
 			return -1;
 		}
 		else c = '<';
@@ -113,7 +87,7 @@ char CompareOp(char op1, char op2) {    //ä¼˜å…ˆçº§åˆ¤æ–­
 			break;
 		}
 		case '=': {
-			printf("é”™è¯¯è¾“å…¥\n");
+			printf("´íÎóÊäÈë\n");
 			return -1;
 		}
 		default:c = '>';
@@ -127,7 +101,7 @@ char CompareOp(char op1, char op2) {    //ä¼˜å…ˆçº§åˆ¤æ–­
 			break;
 		}
 		case '(': {
-			printf("é”™è¯¯è¾“å…¥\n");
+			printf("´íÎóÊäÈë\n");
 			return -1;
 		}
 		default: c = '>';
@@ -140,12 +114,12 @@ char CompareOp(char op1, char op2) {    //ä¼˜å…ˆçº§åˆ¤æ–­
 
 
 
-Element GetNumberFromStr(char s[]) {  //ä»å«å•ä¸ªæ•°çš„å­—ç¬¦æ•°ç»„ä¸­å¾—å‡ºç›¸åº”çš„å€¼ 
+Element GetNumberFromStr(char s[]) {  //´Óº¬µ¥¸öÊıµÄ×Ö·ûÊı×éÖĞµÃ³öÏàÓ¦µÄÖµ 
 	int flag = 0;
 	int j = 0;
 	int k = 0;
-	char buff1[10];    //ç››æ”¾åˆ†å­çš„å­—ç¬¦ä¸²
-	char buff2[10];    //ç››æ”¾åˆ†æ¯çš„å­—ç¬¦ä¸²
+	char buff1[10];    //Ê¢·Å·Ö×ÓµÄ×Ö·û´®
+	char buff2[10];    //Ê¢·Å·ÖÄ¸µÄ×Ö·û´®
 	Element TheNumber;
 	for (int i = 0; s[i] != '\0'; i++) {
 		buff1[j] = s[i];
@@ -171,7 +145,7 @@ Element GetNumberFromStr(char s[]) {  //ä»å«å•ä¸ªæ•°çš„å­—ç¬¦æ•°ç»„ä¸­å¾—å‡ºç
 }
 
 
-int GetGreatestCommonFactor(int a, int b) {  //è¿”å›æœ€å¤§å…¬å› æ•°
+int GetGreatestCommonFactor(int a, int b) {  //·µ»Ø×î´ó¹«ÒòÊı
 	int temp = 0;
 	while (a != 0) {
 		temp = b % a;
@@ -181,20 +155,20 @@ int GetGreatestCommonFactor(int a, int b) {  //è¿”å›æœ€å¤§å…¬å› æ•°
 	return b;
 }
 
-//è®¡ç®—éƒ¨åˆ†
-Element Add(Element e1, Element e2) {   //åŠ æ³•
+//¼ÆËã²¿·Ö
+Element Add(Element e1, Element e2) {   //¼Ó·¨
 	Element e3;
 	int n = 0;
 	int d = 0;
 	n = e1.numerator * e2.denominator + e2.numerator * e1.denominator;
 	d = e2.denominator * e1.denominator;
-	int C = GetGreatestCommonFactor(n, d);   //æ±‚å‡ºåˆ†å­å’Œåˆ†æ¯çš„æœ€å¤§å…¬å› æ•°
+	int C = GetGreatestCommonFactor(n, d);   //Çó³ö·Ö×ÓºÍ·ÖÄ¸µÄ×î´ó¹«ÒòÊı
 	e3.numerator = n / C;
 	e3.denominator = d / C;
 	return e3;
 }
 
-Element minus(Element e1, Element e2) { //å‡æ³•,å‰ä¸€ä¸ªæ˜¯è¢«å‡æ•°ï¼Œåä¸€ä¸ªæ˜¯å‡æ•°
+Element minus(Element e1, Element e2) { //¼õ·¨,Ç°Ò»¸öÊÇ±»¼õÊı£¬ºóÒ»¸öÊÇ¼õÊı
 	Element e3;
 	int n = 0;
 	int d = 0;
@@ -212,13 +186,13 @@ Element Multiply(Element e1, Element e2) {
 	int d = 0;
 	n = e1.numerator * e2.numerator;
 	d = e2.denominator * e1.denominator;
-	int C = GetGreatestCommonFactor(n, d);   //æ±‚å‡ºåˆ†å­å’Œåˆ†æ¯çš„æœ€å¤§å…¬å› æ•°
+	int C = GetGreatestCommonFactor(n, d);   //Çó³ö·Ö×ÓºÍ·ÖÄ¸µÄ×î´ó¹«ÒòÊı
 	e3.numerator = n / C;
 	e3.denominator = d / C;
 	return e3;
 }
 
-Element Divide(Element e1, Element e2) { //é™¤æ³•ï¼Œå‰ä¸€ä¸ªæ˜¯è¢«é™¤æ•°ï¼Œåä¸€ä¸ªæ˜¯é™¤æ•°
+Element Divide(Element e1, Element e2) { //³ı·¨£¬Ç°Ò»¸öÊÇ±»³ıÊı£¬ºóÒ»¸öÊÇ³ıÊı
 	Element e3;
 	int n = 0;
 	int d = 0;
@@ -233,6 +207,7 @@ Element Divide(Element e1, Element e2) { //é™¤æ³•ï¼Œå‰ä¸€ä¸ªæ˜¯è¢«é™¤æ•°ï¼Œåä
 
 Element CaculateOneOp(Element e1, char op, Element e2) {
 	Element result;
+	extern int ZEROTag;
 	switch (op) {
 	case '+': {
 		result = Add(e1, e2);
@@ -249,7 +224,8 @@ Element CaculateOneOp(Element e1, char op, Element e2) {
 	case -62: {
 		if (e2.numerator == 0)
 		{
-			printf("ä¸èƒ½é™¤ä»¥0\n");
+			//printf("²»ÄÜ³ıÒÔ0\n");
+			ZEROTag = 1;
 		}
 		else result = Divide(e1, e2);
 	}
@@ -258,7 +234,7 @@ Element CaculateOneOp(Element e1, char op, Element e2) {
 }
 
 
-Element AnAnswer(char s[40]) {     //è®¡ç®—å¾—å‡ºç­”æ¡ˆé¡¹
+Element AnAnswer(char s[40]) {     //¼ÆËãµÃ³ö´ğ°¸Ïî
 	NumberStack numberstack;
 	OpStack opstack;
 	Element num1, num2, result, num;
@@ -322,10 +298,74 @@ Element AnAnswer(char s[40]) {     //è®¡ç®—å¾—å‡ºç­”æ¡ˆé¡¹
 	return result;
 }
 
+Element f_AnAnswer(char s[40]) {     //¼ÆËãµÃ³ö´ğ°¸Ïî
+	NumberStack numberstack;
+	OpStack opstack;
+	Element num1, num2, result, num;
+	char c, sign;
+	char *str = NULL;
+	int count = 0;
+
+	InitNumberStack(&numberstack);
+	InitOpStack(&opstack);
+
+	PushOpStack(&opstack, '=');
+	int j = 0;
+	//while (s[j] != '\t') j++;
+	int i = j;
+	j = 0;
+	c = s[i];
+	while ((c != '=') || opstack.op[opstack.top] != '=') {
+		if (JudgeOp(c) == 0) {
+			str = (char*)malloc(sizeof(char) * 12);
+			do {
+				*str = c;
+				str++;
+				count++;
+				i++;
+				c = s[i];
+			} while (JudgeOp(c) == 0);
+			*str = '\0';
+			str = str - count;
+			num = GetNumberFromStr(str);
+			PushNumberStack(&numberstack, num);
+			str = NULL;
+			count = 0;
+		}
+		else {    //wei 
+			switch (CompareOp(opstack.op[opstack.top], c)) {
+			case '<': {
+				PushOpStack(&opstack, c);
+				i++;
+				c = s[i];
+				break;
+			}
+			case '=': {
+				sign = PopOpstack(&opstack);
+				i++;
+				c = s[i];
+				break;
+			}
+			case '>': {
+				sign = PopOpstack(&opstack);
+				num2 = PopNumberStack(&numberstack);
+				num1 = PopNumberStack(&numberstack);
+				result = CaculateOneOp(num1, sign, num2);
+				PushNumberStack(&numberstack, result);
+				break;
+			}
+
+			}
+		}
+	}
+	result = numberstack.e[numberstack.top];
+	return result;
+}
 
 
 
-Equation *OpenAndSave(char c[800], int n) {    //æ‰“å¼€æ–‡ä»¶å¹¶å°†é¢˜ç›®å­˜å…¥é—®é¢˜ç»“æ„ä½“æ•°ç»„,nä¸ºé¢˜æ•°
+
+Equation *OpenAndSave(char c[800], int n) {    //´ò¿ªÎÄ¼ş²¢½«ÌâÄ¿´æÈëÎÊÌâ½á¹¹ÌåÊı×é,nÎªÌâÊı
 	FILE *fp;
 	Equation *qu;
 	char buff[50];
@@ -336,9 +376,10 @@ Equation *OpenAndSave(char c[800], int n) {    //æ‰“å¼€æ–‡ä»¶å¹¶å°†é¢˜ç›®å­˜å…¥é
 		printf("The file doesn't exist!\n");
 		exit(0);
 	}
+	int j = 0;
 	while (fgets(buff, 100, fp) != NULL) {
 		len = strlen(buff);
-		buff[len - 1] = '\0';            //å»æ‰æ¢è¡Œç¬¦
+		buff[len - 1] = '\0';            //È¥µô»»ĞĞ·û
 		strcpy(qu->question, buff);
 		qu++;
 		count++;
@@ -348,45 +389,57 @@ Equation *OpenAndSave(char c[800], int n) {    //æ‰“å¼€æ–‡ä»¶å¹¶å°†é¢˜ç›®å­˜å…¥é
 	return qu;
 }
 
-Element *ReadTheAnswer(char AnsFile[800], int n){ //æ‰“å¼€æ–‡ä»¶å¹¶å°†ç­”æ¡ˆå­˜å…¥åˆ†æ•°ç»“æ„ä½“æ•°ç»„
+Element *ReadTheAnswer(char AnsFile[800], int n) { //´ò¿ªÎÄ¼ş²¢½«´ğ°¸´æÈë·ÖÊı½á¹¹ÌåÊı×é
 	FILE *fp;
+	int time = 0;
 	Element *ans;
-	ans = (Element*)malloc(sizeof(Element));
+	ans = (Element*)malloc(sizeof(Element)*n*3);
 	int len;
-	int count;
-	char buff[20] = {0};	                             //å­˜æ”¾å•ä¸ªç­”æ¡ˆå­—ç¬¦ä¸²
-	char buff1[10]= {0};
-	char buff2[10] = {0};                              //åˆ†åˆ«å­˜æ”¾åˆ†å­åˆ†æ¯
+	int count = 0;
+	char buff[2000] = { 0 };	                             //´æ·Åµ¥¸ö´ğ°¸×Ö·û´®
+	char buff1[10] = { 0 };
+	char buff2[10] = { 0 };                              //·Ö±ğ´æ·Å·Ö×Ó·ÖÄ¸
 	if ((fp = fopen(AnsFile, "r")) == NULL) {
 		printf("The file doesn't exist!\n");
 		exit(0);
 	}
-	while (fgets(buff, 50, fp) != NULL){
+	while (fgets(buff, 500, fp) != NULL) {
 		len = strlen(buff);
-		buff[len - 1] = '\0';                     //å»æ‰æ¢è¡Œç¬¦
+		if (len == 0) continue;
+		buff[len - 1] = '\0';                     //È¥µô»»ĞĞ·û
 		int i = 0;
 		int j = 0;
 		int k = 0;
-		while(buff[i] != '\t') i++;               //ç¡®å®šç­”æ¡ˆä½ç½®
-	    for(i; buff[i] != '/' and buff[i] != '\0'; i++){
-		    buff1[j] = buff[i];                     //************
-		    j++;
-	    }
+		while (buff[i] != '=') i++;               //È·¶¨´ğ°¸Î»ÖÃ,Ñ­»·ËÀËø
+		if ((strlen(buff) - 1) == i)
+		{
+			ans->numerator = -1;
+			ans->denominator = 1;
+			ans++;
+			count++;
+			continue;
+		}
+		i++;
+		for (i; buff[i] != '/' and buff[i] != '\0'; i++) {
+			buff1[j] = buff[i];                     //************
+			j++;
+		}
+		int temp = sizeof(buff1);
 		buff1[j] = '\0';
-		i++;            		//**********å¯èƒ½å‡ºé”™ç‚¹ 
-	    for(i; buff[i] != '\0'; i++){
+		i++;            		//**********¿ÉÄÜ³ö´íµã 
+		for (i; buff[i] != '\0'; i++) {
 			buff2[k] = buff[i];
 			k++;
 		}
 		buff2[k] = '\0';
 		ans->numerator = atoi(buff1);
 		ans->denominator = atoi(buff2);
-		if(ans->denominator == 0){
+		if (ans->denominator == 0) {
 			ans->denominator = 1;
 		}
 		memset(buff1, 0, 10);
 		memset(buff2, 0, 10);
-		memset(buff, 0, 20);
+		memset(buff, 0, 2000);
 		ans++;
 		count++;
 	}
@@ -395,13 +448,28 @@ Element *ReadTheAnswer(char AnsFile[800], int n){ //æ‰“å¼€æ–‡ä»¶å¹¶å°†ç­”æ¡ˆå­˜å
 	return ans;
 }
 
-
-char *OutputElement(Element e) {               //å°†é¡¹è½¬ä¸ºå­—ç¬¦ä¸²
+char *OutputElement(Element e) {               //½«Ïî×ªÎª×Ö·û´®
 	char *str;
-	char buff1[10];
-	char buff2[10];
+	char buff1[30];
+	char buff2[30];
+	char temp[30];
+	int daifenshu = 0;
 	char c[3] = { '/', ' ' };
-	_itoa(e.numerator, buff1, 10);
+	if (e.numerator > e.denominator&&e.denominator!=1)
+	{
+		daifenshu = e.numerator / e.denominator;
+		e.numerator = e.numerator-daifenshu * e.denominator ;
+		if (e.numerator == 0)
+		{
+			e.numerator = daifenshu;
+			e.denominator = 1;
+		}
+		_itoa(daifenshu,buff1, 10);
+		strcat_s(buff1, strlen(buff1) + 2, "^");
+		_itoa(e.numerator, temp, 10);
+		strcat_s(buff1, strlen(buff1) + 1 + strlen(temp), temp);
+	}
+	else _itoa(e.numerator, buff1, 10);
 	_itoa(e.denominator, buff2, 10);
 	str = (char*)malloc(sizeof(char) * 14);
 	strcpy(str, buff1);
@@ -412,7 +480,7 @@ char *OutputElement(Element e) {               //å°†é¡¹è½¬ä¸ºå­—ç¬¦ä¸²
 	return str;
 }
 
-void SaveAnswers(Equation *ep, int n) {    //è®¡ç®—å‡ºç­”æ¡ˆå¹¶ä¿å­˜åˆ°Equationç»“æ„çš„answerä¸­,nä¸ºé¢˜æ•°
+void SaveAnswers(Equation *ep, int n) {    //¼ÆËã³ö´ğ°¸²¢±£´æµ½Equation½á¹¹µÄanswerÖĞ,nÎªÌâÊı
 	int count = 0;
 	int i = 0;
 	for (i; i < n; i++) {
@@ -423,7 +491,7 @@ void SaveAnswers(Equation *ep, int n) {    //è®¡ç®—å‡ºç­”æ¡ˆå¹¶ä¿å­˜åˆ°Equation
 	ep = ep - count;
 }
 
-void OutputFile(Equation *ep, char c[800], int n) {   //å°†Equationç»“æ„ä¸­çš„answerè¾“å‡ºåˆ°æ–‡ä»¶
+void OutputFile(Equation *ep, char c[800], int n) {   //½«Equation½á¹¹ÖĞµÄanswerÊä³öµ½ÎÄ¼ş
 	FILE * fp;
 	int i = 1;
 	int count = 0;
@@ -447,45 +515,50 @@ void OutputFile(Equation *ep, char c[800], int n) {   //å°†Equationç»“æ„ä¸­çš„a
 
 }
 
-void OpenFileAndGiveTheAnswer(char *filename, int n) {  //ä¼ å…¥æ–‡ä»¶åå’Œé¢˜ç›®æ•°
+void OpenFileAndGiveTheAnswer(char *filename, int n) {  //´«ÈëÎÄ¼şÃûºÍÌâÄ¿Êı
 	Equation* ep;
 	char aFile[] = "Answers.txt";
 	ep = (Equation*)malloc(sizeof(Equation) * n);
 	ep = OpenAndSave(filename, n);
 	SaveAnswers(ep, n);
 	OutputFile(ep, aFile, n);
-	ep = NULL;
+	//ep = NULL;
+	free(ep);
 }
 
 
-
-
-void CompareAnswerAndGiveTheGrade(char QFile[800], char AnsFile[800], int n){  //è¯»å–æ–‡ä»¶ï¼Œä¿å­˜ç­”æ¡ˆï¼Œåˆ†åˆ«å¯¹æ¯”
+void CompareAnswerAndGiveTheGrade(char QFile[800], char AnsFile[800], int n) {  //¶ÁÈ¡ÎÄ¼ş£¬±£´æ´ğ°¸£¬·Ö±ğ¶Ô±È
 	Element *ansp;
 	int count = 0;
+	extern int EMPTY;
 	ansp = (Element*)malloc(sizeof(Element) * n);
 	ansp = ReadTheAnswer(AnsFile, n);
-	
+
 	Equation *ep;
 	ep = (Equation*)malloc(sizeof(Equation) * n);
 	ep = OpenAndSave(QFile, n);
 	SaveAnswers(ep, n);
-	
+
 	int corrects = 0;
 	int wrongs = 0;
-	int correctnumber[n] = {0};
-	int wrongnumber[n] = {0};
+	int *correctnumber;
+	int *wrongnumber;
+	correctnumber = (int*)calloc(n, sizeof(int));
+	wrongnumber = (int*)calloc(n, sizeof(int));
+	memset(correctnumber, 0, n);
+	memset(wrongnumber, 0, n);
+
 	int j = 0;
 	int k = 0;
-	for(int i = 1; i <= n; i++){
-		if((ansp->numerator == ep->answer.numerator) and (ansp->denominator == ep->answer.denominator)){   //æ­£è´Ÿå·é—®é¢˜
-			corrects++;                         //æ­£ç¡®æ•°é‡åŠ ä¸€
-            correctnumber[j] = i;                 //æ­£ç¡®é¢˜å·å­˜å…¥æ•°ç»„
-            j++;			
+	for (int i = 1; i <= n; i++) {
+		if ((ansp->numerator == ep->answer.numerator) and (ansp->denominator == ep->answer.denominator)) {   //Õı¸ººÅÎÊÌâ
+			corrects++;                         //ÕıÈ·ÊıÁ¿¼ÓÒ»
+			correctnumber[j] = i;                 //ÕıÈ·ÌâºÅ´æÈëÊı×é
+			j++;
 		}
-		else{
-			wrongs++;                           //é”™è¯¯æ•°é‡åŠ ä¸€
-			wrongnumber[k] = i;                   //é”™è¯¯é¢˜å·å­˜å…¥æ•°ç»„
+		else {
+			wrongs++;                           //´íÎóÊıÁ¿¼ÓÒ»
+			wrongnumber[k] = i;                   //´íÎóÌâºÅ´æÈëÊı×é
 			k++;
 		}
 		ansp++;
@@ -494,45 +567,49 @@ void CompareAnswerAndGiveTheGrade(char QFile[800], char AnsFile[800], int n){  /
 	}
 	ansp = ansp - count;
 	ep = ep - count;
-//	free(ansp);
-//	free(ep);
-	
+	//	free(ansp);
+	//	free(ep);
+
 	FILE * fp;
 	if ((fp = fopen("Grade.txt", "w")) == NULL) {
 		printf("Can not open this file!\n");
 		exit(0);
-	}                          
-	char correctline[80] = {0};                               //å¯èƒ½éœ€è¦æ‰©å®¹
-	char wrongline[80] = {0};
-	char left[3] = {'(' , ' '};
-	char right[3] = {' ', ')'};
-	char mid[3] = {',' , ' '};
-	char buff[10] = {0};
+	}
+	char *correctline;                               //ÕæµÄĞèÒªÀ©Èİ
+	char *wrongline;
+	correctline = (char*)calloc(2 * n*(log10(n) + 1), sizeof(char));
+	wrongline = (char*)calloc(2*n*(log10(n) + 1), sizeof(char));
+
+	char left[3] = { '(' , ' ' };
+	char right[3] = { ' ', ')' };
+	char mid[3] = { ',' , ' ' };
+	char buff[30] = { 0 };										//buffÀï´æ´¢µÄÊÇÌâºÅ
 	strcpy(buff, "Correct:");
 	strcpy(correctline, buff);
 	strcpy(buff, "Wrong:");
 	strcat(wrongline, buff);
-	//ç¬¬ä¸€è¡Œæ”¶å°¾
+	//µÚÒ»ĞĞÊÕÎ²
 	_itoa(corrects, buff, 10);
 	strcat(correctline, buff);
 	strcat(correctline, left);
-	for(int j = 0; j < corrects; j++){
+	for (int j = 0; j < corrects; j++) {
 		_itoa(correctnumber[j], buff, 10);
 		strcat(correctline, buff);
 		strcat(correctline, mid);
 	}
 	strcat(correctline, right);
-	//ç¬¬ä¸€è¡Œæ”¶å°¾ç»“æŸï¼Œç¬¬äºŒè¡Œå¼€å§‹æ”¶å°¾
+	//µÚÒ»ĞĞÊÕÎ²½áÊø£¬µÚ¶şĞĞ¿ªÊ¼ÊÕÎ²
 	_itoa(wrongs, buff, 10);
 	strcat(wrongline, buff);
 	strcat(wrongline, left);
 	j = 0;
-	for(j; j < wrongs; j++){
+	for (j; j < wrongs; j++) {
 		_itoa(wrongnumber[j], buff, 10);
 		strcat(wrongline, buff);
 		strcat(wrongline, mid);
 	}
 	strcat(wrongline, right);
+	
 	fputs(correctline, fp);
 	fputs("\n", fp);
 	fputs(wrongline, fp);
@@ -542,30 +619,4 @@ void CompareAnswerAndGiveTheGrade(char QFile[800], char AnsFile[800], int n){  /
 
 
 
-int main() {
-	char qFile[] = "e:\\Question.txt";
-	//OpenFileAndGiveTheAnswer(qFile, 10);
-	//Equation *ep;
-	//ep = (Equation*)malloc(sizeof(Equation) * 4);
-	//ep = OpenAndSave(qFile, 4);
-	//SaveAnswers(ep, 4);
-	//for (int i = 0; i < 4; i++) {
-		//printf("%s\n", OutputElement(ep->answer));
-		//ep++;
-	//}
-	Element *e;
-	int count = 0;
-	e = (Element*)malloc(sizeof(Element) * 10);
-	e = ReadTheAnswer("C:\\Users\\auror\\Desktop\\Answers.txt", 10);
-	for(int i; i<10; i++ ){
-		printf("%d/%d\n",e->numerator, e->denominator);
-		e++;
-		count++;
-	}
-	e = e - count;
-//e.denominator = 21231;
-	//e.numerator = 12336;
-	//printf("%s\n", OutputElement(e));
-	//CompareAnswerAndGiveTheGrade(qFile, "C:\\Users\\auror\\Desktop\\Answers.txt",10);
-	return 0;
-}
+

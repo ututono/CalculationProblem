@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{5C5B7695-E585-4A33-A67C-151953FCB40A}</ProjectGuid>
+    <ProjectGuid>{BA24FA6F-6134-485A-9216-05BDF1E79809}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CalculationProblemCreater</RootNamespace>
+    <RootNamespace>TestAnswer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,14 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Funktion.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="answer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="answer.cpp" />
-    <ClCompile Include="CalculationProblemCreater.cpp" />
-    <ClCompile Include="Funktion.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

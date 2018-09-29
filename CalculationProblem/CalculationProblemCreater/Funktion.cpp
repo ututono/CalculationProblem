@@ -5,15 +5,6 @@
 
 struct Variable m_VarStruct[4];
 
-//
-//int InitStack_Sq(VarSq & S, int size, int inc)
-//{
-//	S.elem = (char *)malloc(sizeof(char)*size);
-//	if (NULL == S.elem) return OVERFLOW;
-//	S.to
-//	return 0;
-//}
-
 char OperationalCreater()
 {
 	switch (rand()%4)
@@ -79,7 +70,6 @@ void NumCreater(int r, struct Variable m_VarStruct[],int x)			//随机生成整数和真
 
 int Creater(int r)
 {
-	//char op = OperationalCreater();
 	int atornum = rand() %3+2;			//2-4之间的整数
 	for (int n = 0; n < atornum; n++)
 	{
@@ -266,9 +256,9 @@ BOOL BCR(char *calproblem, int x, int num)			//nur after Var
 	return 0;
 }
 
-char * CalProblem(int num)
+char * CalProblem(int num,int rlen)
 {
-	extern int RB, LB;
+	extern int RB, LB,OPNUM_MAX;
 	int op = num - 1;
 	int i = 0;
 	BOOL BC = 0;
@@ -278,26 +268,14 @@ char * CalProblem(int num)
 
 	//内存分配
 	memset(opch, 0, sizeof(opch));
-
-	//calproblem = (char*)calloc(sizeof(char)*op*2 *4*8);
-	calproblem = (char*)calloc(500,sizeof(char));
+	calproblem = (char*)calloc((rlen*3+1)*(OPNUM_MAX+1),sizeof(char));			//当变量全部都是分数时，数组空间最大
 	if (calproblem==NULL)
 	{
 		return ERROR;
 	}
 	memset(calproblem, 0, sizeof(calproblem));
-	//for (int n = 0; n < num; n++)
-	//{
-	//	if (NULL == realloc(calproblem, strlen(calproblem) * sizeof(char) + strlen(m_VarStruct[n].val)*sizeof(char)+sizeof(char)))
-	//	{
-	//		return ERROR;
-	//	}
-	//	memset(calproblem, 0, sizeof(calproblem));
-	//}
 
-	//
 	if (num == 2)
-		//if (true)
 	{
 		strcpy_s(calproblem, m_VarStruct[0].size+ sizeof("\0"), m_VarStruct[0].val);
 		opch[0] =OperationalCreater();
@@ -339,4 +317,23 @@ char * CalProblem(int num)
 	}
 	RB = 0; LB = 0;
 	return calproblem;
+}
+
+void DelBracket(char * calproblem)
+{
+	int i = 0;
+	int len = strlen(calproblem);
+	while (!isdigit(calproblem[0])&&!isdigit(calproblem[len-1]))
+	{
+		if (calproblem[0] == '('&&calproblem[len - 1] == ')')
+		{
+			for (i = 0; i < len; i++)
+			{
+				calproblem[i] = calproblem[i + 1];
+			}
+			calproblem[i-2] = '\0';
+		}
+		len = strlen(calproblem);
+	}
+
 }
